@@ -1,0 +1,14 @@
+inputSet:
+  name: Build_Dingoldine_simplebank_1731843250033-pr-trigger-input-set
+  identifier: Build_Dingoldine_simplebank_1731843250033prtriggerinputset
+  orgIdentifier: default
+  projectIdentifier: default_project
+  pipeline:
+    identifier: Build_Dingoldine_simplebank_1731843250033
+    properties:
+      ci:
+        codebase:
+          build:
+            type: PR
+            spec:
+              number: <+trigger.prNumber>
