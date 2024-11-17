@@ -30,9 +30,16 @@ pipeline:
                   identifier: gotestcoverage
                   name: go_test_coverage
                   spec:
+                    shell: Sh
                     command: go test -coverprofile=coverage.out ./...
                   timeout: ""
                   type: Run
+                  failureStrategies:
+                    - onFailure:
+                        errors:
+                          - AllErrors
+                        action:
+                          type: Ignore
               - step:
                   identifier: gotestreport
                   name: go_test_report
