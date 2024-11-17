@@ -63,11 +63,11 @@ pipeline:
                   identifier: dockerbuild
                   name: docker_build
                   spec:
-                    caching: true
-                    connectorRef: <+input>
-                    repo: hello/world
+                    connectorRef: <+input>.allowedValues(account.Personal_Registry)
+                    repo: dingoldine/simplebank
                     tags:
                       - latest
+                    caching: true
                   timeout: ""
                   type: BuildAndPushDockerRegistry
           platform:
