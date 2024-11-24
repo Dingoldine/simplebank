@@ -82,30 +82,19 @@ func (store *Store) TransferTx(ctx context.Context, t TransferTxParams) (Transfe
 			return err
 		}
 
-		r.FromAccount, err = q.GetAccountForUpdate(ctx, t.FromAccountID)
-		if err != nil {
-			return err
-		}
+		// update in consistent order to avoid deadlocks on simultaneous transfers
+		if t.ToAccountID < t.FromAccountID {
+			r.ToAccount, r.FromAccount, err = transactBetweenAccounts(ctx, q, t.ToAccountID, t.Amount, t.FromAccountID, -t.Amount)
+			if err != nil {
+				return err
+			}
 
-		r.FromAccount, err = q.UpdateAccount(ctx, UpdateAccountParams{
-			ID:      t.FromAccountID,
-			Balance: r.FromAccount.Balance - t.Amount,
-		})
-		if err != nil {
-			return err
-		}
+		} else {
+			r.FromAccount, r.ToAccount, err = transactBetweenAccounts(ctx, q, t.FromAccountID, -t.Amount, t.ToAccountID, t.Amount)
+			if err != nil {
+				return err
+			}
 
-		r.ToAccount, err = q.GetAccountForUpdate(ctx, t.ToAccountID)
-		if err != nil {
-			return err
-		}
-
-		r.ToAccount, err = q.UpdateAccount(ctx, UpdateAccountParams{
-			ID:      t.ToAccountID,
-			Balance: r.ToAccount.Balance + t.Amount,
-		})
-		if err != nil {
-			return err
 		}
 
 		return nil
@@ -113,4 +102,31 @@ func (store *Store) TransferTx(ctx context.Context, t TransferTxParams) (Transfe
 
 	return r, err
 
+}
+
+func transactBetweenAccounts(
+	ctx context.Context,
+	q *Queries,
+	accID1 int64,
+	amount1 float64,
+	accID2 int64,
+	amount2 float64,
+) (acc1 Account, acc2 Account, err error) {
+
+	acc1, err = q.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
+		ID:     accID1,
+		Amount: amount1,
+	})
+	if err != nil {
+		return
+	}
+
+	acc2, err = q.UpdateAccountBalance(ctx, UpdateAccountBalanceParams{
+		ID:     accID2,
+		Amount: amount2,
+	})
+	if err != nil {
+		return
+	}
+	return
 }

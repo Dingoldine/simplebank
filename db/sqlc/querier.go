@@ -9,7 +9,6 @@ import (
 )
 
 type Querier interface {
-	AddAccountBalance(ctx context.Context, amount float64) (Account, error)
 	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateEntry(ctx context.Context, arg CreateEntryParams) (Entry, error)
 	CreateTransfer(ctx context.Context, arg CreateTransferParams) (Transfer, error)
@@ -25,6 +24,7 @@ type Querier interface {
 	ListEntrys(ctx context.Context, arg ListEntrysParams) ([]Entry, error)
 	ListTransfers(ctx context.Context, arg ListTransfersParams) ([]Transfer, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)
+	UpdateAccountBalance(ctx context.Context, arg UpdateAccountBalanceParams) (Account, error)
 	UpdateEntry(ctx context.Context, arg UpdateEntryParams) error
 	UpdateTransfer(ctx context.Context, arg UpdateTransferParams) error
 }
